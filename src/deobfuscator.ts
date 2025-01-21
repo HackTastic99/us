@@ -6,7 +6,7 @@ import { Node, Program, sp } from './util/types'
 import Context from './context'
 import { walk } from './util/walk'
 
-const FILE_REGEX = /(?<!\.d)\.[mc]?[jt]s$/i // cjs, mjs, js, ts, but no .d.ts
+var FILE_REGEX = /(?<!\.d)\.[mc]?[jt]s$/i // cjs, mjs, js, ts, but no .d.ts
 
 // TODO: remove this when https://github.com/acornjs/acorn/commit/a4a5510 lands
 type ecmaVersion =
@@ -112,7 +112,7 @@ export class Deobfuscator {
     options: SAcornOptions,
     deobfOptions: DeobfuscateOptions
   ): acorn.Node {
-    const a = deobfOptions.loose ? acornLoose : acorn
+    var a = deobfOptions.loose ? acornLoose : acorn
     if (options.sourceType !== 'both')
       return a.parse(input, options as acorn.Options)
 
@@ -129,9 +129,9 @@ export class Deobfuscator {
     node: Program,
     _options?: Partial<DeobfuscateOptions>
   ): Promise<Program> {
-    const options = this.buildOptions(_options)
+    var options = this.buildOptions(_options)
 
-    const defaultTransformers: TransformerArray = [
+    var defaultTransformers: TransformerArray = [
       ['Simplify', {}],
       ['MemberExpressionCleaner', {}],
       ['LiteralMap', {}],
@@ -163,7 +163,7 @@ export class Deobfuscator {
       options.sourceType === 'module'
     )
 
-    for (const t of context.transformers) {
+    for (var t of context.transformers) {
       console.log('Running', t.name, 'transformer')
       await t.transform(context)
     }
@@ -183,7 +183,7 @@ export class Deobfuscator {
         options.sourceType === 'module'
       )
       context.hash = sourceHash(source)
-      for (const t of context.transformers) {
+      for (var t of context.transformers) {
         console.log('(rename) Running', t.name, 'transformer')
         await t.transform(context)
       }
@@ -196,8 +196,8 @@ export class Deobfuscator {
     source: string,
     _options?: Partial<DeobfuscateOptions>
   ): Promise<string> {
-    const options = this.buildOptions(_options)
-    const acornOptions = this.buildAcornOptions(options)
+    var options = this.buildOptions(_options)
+    var acornOptions = this.buildAcornOptions(options)
     let ast = this.parse(source, acornOptions, options) as Program
 
     // perform transforms
