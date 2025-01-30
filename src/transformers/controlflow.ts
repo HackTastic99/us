@@ -41,12 +41,12 @@ export default class ControlFlow extends Transformer<ControlFlowOptions> {
 
     const params = fx.params as Identifier[],
       paramMap = new Map<string, Node>()
-    let i = 0
+    var i = 0
     for (const p of params) {
       paramMap.set(p.name, cx.arguments[i])
       ++i
     }
-    let immRtn = immutate(fx.body.body[0].argument)
+    var immRtn = immutate(fx.body.body[0].argument)
     walk(immRtn, {
       Identifier(id) {
         const node = paramMap.get(id.name)
@@ -86,7 +86,7 @@ export default class ControlFlow extends Transformer<ControlFlowOptions> {
             walk(node, {
               ExpressionStatement(expr) {
                 if (!Guard.isAssignmentExpression(expr.expression)) return
-                let ae = expr.expression
+                var ae = expr.expression
 
                 if (!Guard.isMemberExpression(ae.left)) return
 
@@ -98,7 +98,7 @@ export default class ControlFlow extends Transformer<ControlFlowOptions> {
 
                 if (ae.left.object.name !== objName) return
 
-                let prop: Property = {
+                var prop: Property = {
                   type: 'Property',
                   start: 0,
                   end: 0,
@@ -133,15 +133,15 @@ export default class ControlFlow extends Transformer<ControlFlowOptions> {
     walk(context.ast, {
       BlockStatement(node) {
         // /shrug
-        let bid = getBlockId(node)
+        var bid = getBlockId(node)
 
-        let cfsn = context.controlFlowStorageNodes.get(bid)
+        var cfsn = context.controlFlowStorageNodes.get(bid)
         if (cfsn) return
         if (node.body.length === 0) return
 
         walk(node, {
           VariableDeclaration(vd) {
-            let rm: string[] = []
+            var rm: string[] = []
             for (const decl of vd.declarations) {
               if (!Guard.isIdentifier(decl.id)) continue
               if (decl.init?.type !== 'ObjectExpression') continue
@@ -165,8 +165,8 @@ export default class ControlFlow extends Transformer<ControlFlowOptions> {
               }
               context.controlFlowStorageNodes.set(bid, cfsn)
               for (const prop of decl.init.properties as PropertyLiteral[]) {
-                let kn: Identifier | Literal = prop.key
-                let key = (
+                var kn: Identifier | Literal = prop.key
+                var key = (
                     Guard.isIdentifier(kn) ? kn.name : kn.value
                   )! as string,
                   i = -1
@@ -185,10 +185,10 @@ export default class ControlFlow extends Transformer<ControlFlowOptions> {
                     })
                   }
                 } else if (Guard.isFunctionExpression(prop.value)) {
-                  let fnb = filterEmptyStatements(prop.value.body.body)
+                  var fnb = filterEmptyStatements(prop.value.body.body)
                   if (fnb.length !== 1) continue
                   if (!Guard.isReturnStatement(fnb[0])) continue
-                  let imm = immutate(prop.value)
+                  var imm = immutate(prop.value)
                   imm.body.body = fnb
                   if (
                     (i = cfsn.functions.findIndex(
@@ -247,7 +247,7 @@ export default class ControlFlow extends Transformer<ControlFlowOptions> {
 
         walk(node, {
           VariableDeclaration(vd) {
-            let rm: string[] = []
+            var rm: string[] = []
             for (const decl of vd.declarations) {
               if (
                 !decl.init ||
@@ -288,7 +288,7 @@ export default class ControlFlow extends Transformer<ControlFlowOptions> {
             if (!cfsn.aliases.includes(mx.object.name)) return
 
             // typeguards still dont work inside arrow funcs(((((
-            let ident = mx.property.name,
+            var ident = mx.property.name,
               i = -1
 
             if (
@@ -308,7 +308,7 @@ export default class ControlFlow extends Transformer<ControlFlowOptions> {
             if (!Guard.isIdentifier(cx.callee.property)) return
             if (!cfsn.aliases.includes(cx.callee.object.name)) return
 
-            let ident = cx.callee.property.name,
+            var ident = cx.callee.property.name,
               i = -1
 
             if (
@@ -353,14 +353,14 @@ export default class ControlFlow extends Transformer<ControlFlowOptions> {
         )
           return
 
-        let shuffleId = switchStmt.discriminant.object.name,
+        var shuffleId = switchStmt.discriminant.object.name,
           indexId = switchStmt.discriminant.property.argument.name
-        let shuffleArr: string[] = [],
+        var shuffleArr: string[] = [],
           startIdx = -1
 
         walk(parent, {
           VariableDeclaration(vd) {
-            let rm: string[] = []
+            var rm: string[] = []
             for (const decl of vd.declarations) {
               if (!Guard.isIdentifier(decl.id)) continue
               if (!decl.init) continue
@@ -375,7 +375,7 @@ export default class ControlFlow extends Transformer<ControlFlowOptions> {
                   continue
                 if (!Guard.isLiteralString(decl.init.arguments[0])) continue
                 // 'nXnXnXnXn'.split(X)
-                let shfStr = decl.init.callee.object.value,
+                var shfStr = decl.init.callee.object.value,
                   sep = decl.init.arguments[0].value
                 shuffleArr = shfStr.split(sep)
                 rm.push(`${decl.start}!${decl.end}`)
@@ -400,11 +400,11 @@ export default class ControlFlow extends Transformer<ControlFlowOptions> {
         // didnt locate arr or index
         if (shuffleArr.length === 0 || startIdx === -1) return
 
-        let nodes: Statement[][] = []
+        var nodes: Statement[][] = []
 
-        for (let i = startIdx; i < shuffleArr.length; i++) {
-          let caseNum = shuffleArr[i]
-          let caze = switchStmt.cases.find(
+        for (var i = startIdx; i < shuffleArr.length; i++) {
+          var caseNum = shuffleArr[i]
+          var caze = switchStmt.cases.find(
             (c) => c.test && Guard.isLiteral(c.test) && c.test.value === caseNum
           )
           if (!caze) return // should restore the variables above before returning
@@ -413,7 +413,7 @@ export default class ControlFlow extends Transformer<ControlFlowOptions> {
           )
         }
 
-        let ourIdx = parent.body.findIndex(
+        var ourIdx = parent.body.findIndex(
           (e) =>
             e.type === node.type && e.start === node.start && e.end === node.end
         )
