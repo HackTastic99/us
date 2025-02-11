@@ -56,7 +56,7 @@ yargs
         fs.readFile(abs, 'utf8', (err, source) => {
           if (err) return console.error('Failed to read file', err.code)
           const deobfuscator = new Deobfuscator()
-          let opts = {
+          var opts = {
             rename: args.rename,
             ecmaVersion: args.ecmaVersion,
             output: args.output,
@@ -65,7 +65,7 @@ yargs
           }
 
           if (args.config) {
-            let configPath = path.resolve(args.config)
+            var configPath = path.resolve(args.config)
             if (!fs.existsSync(configPath)) {
               console.error(
                 'Configuration file',
@@ -80,8 +80,8 @@ yargs
 
           // ready
           deobfuscator.deobfuscateSource(source, opts).then((source) => {
-            let ext = path.extname(abs)
-            let newFilename = opts.output
+            var ext = path.extname(abs)
+            var newFilename = opts.output
               ? opts.output
               : abs.substring(0, abs.length - ext.length) + '.cleaned' + ext
             fs.writeFile(newFilename, source, 'utf8', (err) => {
