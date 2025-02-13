@@ -1,24 +1,24 @@
-let esbuild = require('esbuild'),
+const esbuild = require('esbuild'),
   { join } = require('path'),
   { copyFileSync } = require('fs')
 
-let process_exit = process.exit
+const process_exit = process.exit
 
-let ROOT_PATH = join(__dirname, '..'),
+const ROOT_PATH = join(__dirname, '..'),
   DIST_PATH = join(ROOT_PATH, 'dist'),
   SRC_PATH = join(ROOT_PATH, 'src')
 
-let args = process.argv.slice(2)
+const args = process.argv.slice(2)
 
 // should be 'production' | 'development'
-let env = process.env.NODE_ENV ? process.env.NODE_ENV.trim() : 'development'
+const env = process.env.NODE_ENV ? process.env.NODE_ENV.trim() : 'development'
 
 // --watch or -w
-let watch = args.length > 0 && args[0].match(/^(?:--watch|-w)$/gi) !== null
+const watch = args.length > 0 && args[0].match(/^(?:--watch|-w)$/gi) !== null
 if (watch) process.stdout.write('[watch] ')
 
 // production enables certain things that make debugging harder
-let production = env === 'production' || !watch
+const production = env === 'production' || !watch
 
 function emitTypes() {
   return new Promise((resolve, reject) => {
