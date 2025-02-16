@@ -130,8 +130,8 @@ export default class Context {
   private buildTransformerList(
     list: [string, Partial<TransformerOptions>][]
   ): InstanceType<typeof Transformer>[] {
-    const transformers: InstanceType<typeof Transformer>[] = []
-    for (const [name, opt] of list) {
+    let transformers: InstanceType<typeof Transformer>[] = []
+    for (let [name, opt] of list) {
       switch (name.toLowerCase()) {
         case 'controlflow':
           transformers.push(new ControlFlow(opt))
