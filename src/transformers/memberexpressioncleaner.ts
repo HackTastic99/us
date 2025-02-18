@@ -6,7 +6,7 @@ import Context from '../context'
 
 // only replace if the property accessor matches this
 // will not match content-type
-let VALID_DOT_REGEX = /^[a-z][\w]*$/i
+const VALID_DOT_REGEX = /^[a-z][\w]*$/i
 
 export interface MemberExpressionCleanerOptions extends TransformerOptions {}
 export default class MemberExpressionCleaner extends Transformer<MemberExpressionCleanerOptions> {
