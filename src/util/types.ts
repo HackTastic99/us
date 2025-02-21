@@ -10,7 +10,7 @@ export function sp<T extends ESTree.Node>(
   node: ASTNode<any>,
   props: Partial<ASTNode<T>>
 ): node is ASTNode<T> {
-  for (const key in props) {
+  for (let key in props) {
     ;(node as any)[key] = props[key as keyof ASTNode<T>]
   }
   return true
