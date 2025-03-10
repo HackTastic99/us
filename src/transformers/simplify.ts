@@ -108,7 +108,7 @@ export default class Simplify extends Transformer<SimplifyOptions> {
 
   // This is used in stringdecoder for the push/shift iife
   math(_node: Node) {
-    var { ALLOWED_MATH_OPERS } = this
+    const { ALLOWED_MATH_OPERS } = this
     walk(_node, {
       BinaryExpression(node) {
         // unex & number
@@ -131,7 +131,7 @@ export default class Simplify extends Transformer<SimplifyOptions> {
           Guard.isLiteralNumeric(node.left) &&
           Guard.isLiteralNumeric(node.right)
         ) {
-          var val = mathEval(node.left.value, node.operator, node.right.value)
+          const val = mathEval(node.left.value, node.operator, node.right.value)
           if (isNaN(val)) {
             // will throw error on codegen, ignore
             return
@@ -184,7 +184,7 @@ export default class Simplify extends Transformer<SimplifyOptions> {
   }
 
   literalComparison(_node: Node) {
-    var { ALLOWED_COMPARISON_OPERS, binEval } = this
+    const { ALLOWED_COMPARISON_OPERS, binEval } = this
     walk(_node, {
       BinaryExpression(node) {
         if (
@@ -286,7 +286,7 @@ export default class Simplify extends Transformer<SimplifyOptions> {
         if (!Guard.isBinaryExpression(exst.expression.left)) return
         if (!Guard.isSequenceExpression(exst.expression.right)) return
 
-        var exprs = [...exst.expression.right.expressions].map((e) =>
+        const exprs = [...exst.expression.right.expressions].map((e) =>
           (e.type as string) !== 'ExpressionStatement'
             ? {
                 type: 'ExpressionStatement',
@@ -353,7 +353,7 @@ export default class Simplify extends Transformer<SimplifyOptions> {
         if (!Guard.isBlockStatement(cx.callee.body)) return
         if (cx.callee.body.body.length !== 1) return
         if (!Guard.isReturnStatement(cx.callee.body.body[0])) return
-        var retn = cx.callee.body.body[0].argument
+        const retn = cx.callee.body.body[0].argument
         if (!retn) return
         if (
           [
@@ -376,14 +376,14 @@ export default class Simplify extends Transformer<SimplifyOptions> {
             )
           )
             return
-          var scope = context.scopeManager.acquire(cx.callee)
+          const scope = context.scopeManager.acquire(cx.callee)
           if (!scope) return
-          for (var v of scope.variables) {
+          for (const v of scope.variables) {
             if (v.defs.length !== 1) continue
             let def = v.defs[0]
             if (def.type !== 'Parameter') continue
             let pidx = (def as any).index as number
-            for (var ref of v.references) {
+            for (const ref of v.references) {
               sp<any>(ref.identifier, cx.arguments[pidx])
             }
           }
