@@ -31,7 +31,7 @@ export default class Demangle extends Transformer<DemangleOptions> {
       if (!Guard.isBlockStatement(func.body)) return
       func.body.body = filterEmptyStatements(func.body.body) as Statement[];
       if (func.body.body.length !== 2) return
-      var body = func.body.body
+      let body = func.body.body
 
       // return is (func_name = function(){return any})()
       // callexpression callee AssignmentExpr left Ident right FuncExpression
@@ -39,7 +39,7 @@ export default class Demangle extends Transformer<DemangleOptions> {
       const retn = body[body.length - 1] as ReturnStatement
 
       if (!retn.argument) return
-      var ae: AssignmentExpression, cx: CallExpression
+      let ae: AssignmentExpression, cx: CallExpression
 
       if (Guard.isSequenceExpression(retn.argument)) {
         if (!Guard.isAssignmentExpression(retn.argument.expressions[0])) return
@@ -57,7 +57,7 @@ export default class Demangle extends Transformer<DemangleOptions> {
       if (!Guard.isIdentifier(ae.left)) return
       if (!Guard.isFunctionExpression(ae.right)) return
 
-      var nb = [
+      let nb = [
         body[0],
         {
           type: 'ExpressionStatement',
@@ -94,7 +94,7 @@ export default class Demangle extends Transformer<DemangleOptions> {
       if (!Guard.isBlockStatement(func.body)) return
       if (!func.id) return
       if (func.body.body.length !== 3) return
-      var body = func.body.body
+      let body = func.body.body
       if (
         !Guard.isExpressionStatement(body[1]) ||
         !Guard.isAssignmentExpression(body[1].expression)
@@ -105,9 +105,9 @@ export default class Demangle extends Transformer<DemangleOptions> {
       if (body[1].expression.left.name !== func.id.name) return
       if (!Guard.isFunctionExpression(body[1].expression.right)) return
 
-      var fx = body[1].expression.right,
+      let fx = body[1].expression.right,
         fxb = fx.body.body
-      var nb: Statement[] = []
+      let nb: Statement[] = []
       // extracts offset setter
       if (!Guard.isVariableDeclaration(fxb[0])) return
       if (fxb[0].declarations.length !== 1) return
@@ -156,7 +156,7 @@ export default class Demangle extends Transformer<DemangleOptions> {
       if (fxb.length >= 3) {
         // possibly B64/RC4 type decoder
         if (Guard.isIfStatement(nb[2])) {
-          var ifst = nb[2]
+          let ifst = nb[2]
           if (
             Guard.isBlockStatement(ifst.consequent) &&
             ifst.consequent.body.length > 1 // maybe ==2
@@ -185,7 +185,7 @@ export default class Demangle extends Transformer<DemangleOptions> {
                   ifst.consequent.body[0].expression.right
                 ))
             ) {
-              var dfx: FunctionExpression = (
+              let dfx: FunctionExpression = (
                   Guard.isExpressionStatement(ifst.consequent.body[0])
                     ? (
                         ifst.consequent.body[0]
@@ -225,7 +225,7 @@ export default class Demangle extends Transformer<DemangleOptions> {
                                 dfxb[0].init.declarations[0].init
                               )
                             ) {
-                              var charset =
+                              let charset =
                                 dfxb[0].init.declarations[0].init.value
                               if (charset.length === 65)
                                 dfxb.splice(0, 0, {
@@ -263,7 +263,7 @@ export default class Demangle extends Transformer<DemangleOptions> {
                             ) {
                               // this is if the charset gets moved (it won't)
                               // just in case though
-                              var charset =
+                              let charset =
                                 dfxb[0].body.body[0].expression.right.callee
                                   .object.value
                               if (charset.length === 65)
