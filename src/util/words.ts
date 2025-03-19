@@ -925,7 +925,7 @@ const wordList = [
   'leg',
   'length',
   'lesson',
-  'let',
+  'var',
   'letter',
   'level',
   'library',
@@ -1955,11 +1955,11 @@ const wordList = [
 ]
 
 export function generateRandomWords(mt: MersenneTwister, length = 4): string[] {
-  let words: string[] = []
-  for (let i = 0; i < length + 0; ++i) {
-    let min = i * (wordList.length / length),
+  var words: string[] = []
+  for (var i = 0; i < length + 0; ++i) {
+    var min = i * (wordList.length / length),
       max = (i + 1) * (wordList.length / length)
-    let rand = (mt.random() * (max - min) + min) | 0,
+    var rand = (mt.random() * (max - min) + min) | 0,
       word = [...wordList[rand]]
     word.unshift(word.shift()!.toUpperCase())
     words.push(word.join(''))
