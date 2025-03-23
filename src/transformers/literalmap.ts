@@ -24,12 +24,12 @@ export default class LiteralMap extends Transformer<LiteralMapOptions> {
   demap(context: Context) {
     walk(context.ast, {
       BlockStatement(node) {
-        var map = new Map<string, Map<string, any>>()
+        const map = new Map<string, Map<string, any>>()
 
         walk(node, {
           VariableDeclaration(vd) {
             let rm: string[] = []
-            for (var decl of vd.declarations) {
+            for (const decl of vd.declarations) {
               if (
                 !decl.init ||
                 decl.init.type !== 'ObjectExpression' ||
@@ -47,10 +47,10 @@ export default class LiteralMap extends Transformer<LiteralMapOptions> {
               )
                 continue
 
-              var name = decl.id.name
-              var localMap = map.get(name) || new Map<string, any>()
-              for (var _prop of decl.init.properties) {
-                var prop = _prop as Property
+              const name = decl.id.name
+              const localMap = map.get(name) || new Map<string, any>()
+              for (const _prop of decl.init.properties) {
+                const prop = _prop as Property
                 let key =
                   prop.key.type === 'Identifier'
                     ? prop.key.name
@@ -100,17 +100,17 @@ export default class LiteralMap extends Transformer<LiteralMapOptions> {
   // replace read-only variables in functions
   literals(context: Context) {
     function visitor(func: Function) {
-      var scope = context.scopeManager.acquire(func)
+      const scope = context.scopeManager.acquire(func)
       if (!scope) return
 
-      for (var v of scope.variables) {
+      for (const v of scope.variables) {
         if (v.name === 'arguments') continue
         if (v.identifiers.length !== 1) continue // ?
         if (v.defs.length !== 1) continue // ?
 
-        var def = v.defs[0]
+        const def = v.defs[0]
         if (def.type !== 'Variable') continue // ?
-        var vd = def.node as VariableDeclarator
+        const vd = def.node as VariableDeclarator
 
         if (vd.init?.type !== 'Literal') continue
         if (typeof vd.init.value === 'string' && vd.init.value.length === 65)
@@ -119,7 +119,7 @@ export default class LiteralMap extends Transformer<LiteralMapOptions> {
         // prevents us from replacing overwrote variables
         if (!v.references.every((ref) => ref.init || ref.isReadOnly())) continue
 
-        for (var ref of v.references) {
+        for (const ref of v.references) {
           // Dont replace our init reference lol
           if (ref.init) {
             let node = def.node as VariableDeclarator
@@ -131,7 +131,7 @@ export default class LiteralMap extends Transformer<LiteralMapOptions> {
             }
             continue
           }
-          var refid = findNodeAt<Identifier>(
+          const refid = findNodeAt<Identifier>(
             func,
             ref.identifier.range!,
             'Identifier'
