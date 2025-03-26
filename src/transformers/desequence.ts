@@ -14,15 +14,15 @@ export default class Desequence extends Transformer<DesqeuenceOptions> {
     function visitor(node: BlockStatement | Program) {
       // find expstmt > seqexp in node.body
 
-      let length = node.body.length
-      for (let i = 0; i < length; ++i) {
+      var length = node.body.length
+      for (var i = 0; i < length; ++i) {
         const stmt = node.body[i]
         if (
           Guard.isExpressionStatement(stmt) &&
           Guard.isSequenceExpression(stmt.expression)
         ) {
           node.body[i].type = 'EmptyStatement'
-          let expr = stmt.expression.expressions.map((exp) => ({
+          var expr = stmt.expression.expressions.map((exp) => ({
             type: 'ExpressionStatement',
             expression: exp,
           })) as ExpressionStatement[]
