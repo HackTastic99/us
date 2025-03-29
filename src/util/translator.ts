@@ -15,7 +15,7 @@ export function unaryExpressionToNumber(
   if (typeof node.argument.value !== 'number' && !pi)
     throw new TypeError('UnaryExpression argument value is not number')
 
-  let num = pi
+  const num = pi
     ? parseInt(node.argument.value as string)
     : (node.argument.value as number)
   if (node.operator === '-') num = num * -1
