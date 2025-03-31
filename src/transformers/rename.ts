@@ -43,11 +43,11 @@ export default class Rename extends Transformer<RenameOptions> {
       case 'Parameter':
         return 'arg'
       default:
-        return 'var'
+        return 'let'
     }
   }
   getUpperScope = (scope: Scope): Scope | undefined => {
-    var upper = scope.upper
+    let upper = scope.upper
     if (!upper) return scope
     if (upper.type === 'global') return scope
     while (upper?.upper?.type !== 'global') {
@@ -56,18 +56,18 @@ export default class Rename extends Transformer<RenameOptions> {
     return upper
   }
   scopeVisitor = (context: Context, scope: Scope) => {
-    var renamed = new Map<string, string>()
-    var upperScope = this.getUpperScope(scope)
+    let renamed = new Map<string, string>()
+    let upperScope = this.getUpperScope(scope)
     if (!upperScope) return // ?
 
     for (const v of scope.variables) {
       if (v.name === 'arguments') continue
-      var newName =
+      let newName =
         this.getVarPrefix(v.defs[0].type) +
         generateRandomWords(this.mt, 2).join('')
       renamed.set(v.name, newName)
       for (const def of v.defs) {
-        var ident = findNodeAt<Identifier>(
+        let ident = findNodeAt<Identifier>(
           context.ast,
           def.name.range!,
           'Identifier'
@@ -76,7 +76,7 @@ export default class Rename extends Transformer<RenameOptions> {
         ident.name = newName
       }
       for (const ref of v.references) {
-        var ident = findNodeAt<Identifier>(
+        let ident = findNodeAt<Identifier>(
           context.ast,
           ref.identifier.range!,
           'Identifier'
@@ -88,7 +88,7 @@ export default class Rename extends Transformer<RenameOptions> {
     }
 
     for (const ref of scope.references) {
-      var ident = findNodeAt<Identifier>(
+      let ident = findNodeAt<Identifier>(
         context.ast,
         ref.identifier.range!,
         'Identifier'
