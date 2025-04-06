@@ -121,7 +121,7 @@ function updateIdentifiers(stack: VarStack, obj: any) {
 function evaluateBinaryExpr(stack: VarStack, _expr: BinaryExpression): number {
   const st = new Simplify({})
 
-  var expr = immutate(_expr)
+  let expr = immutate(_expr)
   log('chain =', generateCode(expr))
 
   updateIdentifiers(stack, expr)
@@ -156,11 +156,11 @@ function evaluateSequenceAssignments(
     const vk = expr.left.name,
       operator = expr.operator
 
-    var ie = immutate(expr.right)
+    let ie = immutate(expr.right)
     updateIdentifiers(stack, ie)
     log('(1/4) Evaluating', vk, operator, generateCode(ie as any))
 
-    for (var iters = 0; iters < MAX_SEQUENCE_ASSIGNMENT_ITERS; ++iters) {
+    for (let iters = 0; iters < MAX_SEQUENCE_ASSIGNMENT_ITERS; ++iters) {
       if (Guard.isLiteralNumeric(ie) || Guard.isUnaryExpressionNumeric(ie))
         break
       st.literalComparison(ie)
@@ -180,7 +180,7 @@ function evaluateSequenceAssignments(
 
     log('(4/4) Evaluated', vk, operator, generateCode(ie as unknown as Node))
 
-    var effect = literalOrUnaryExpressionToNumber(ie)
+    let effect = literalOrUnaryExpressionToNumber(ie)
     evaluateAssignmentExpr(stack, vk, operator, effect)
     log(`stack[${vk}] = ${stack.get(vk)}`)
     log('='.repeat(32))
@@ -199,7 +199,7 @@ export default class JSCControlFlow extends Transformer<JSCControlFlowOptions> {
       const scope = context.scopeManager.acquire(node)
       if (!scope) return
       if (!Guard.isBlockStatement(node.body)) return
-      var whiles = node.body.body.filter(
+      let whiles = node.body.body.filter(
         (i) => i.type === 'WhileStatement'
       ) as WhileStatement[]
       for (const w of whiles) {
@@ -213,7 +213,7 @@ export default class JSCControlFlow extends Transformer<JSCControlFlowOptions> {
 
         const stack: VarStack = new Map()
 
-        var bx = w.test,
+        let bx = w.test,
           additive = false
         while (Guard.isBinaryExpression(bx)) {
           additive = bx.operator === '+'
@@ -227,7 +227,7 @@ export default class JSCControlFlow extends Transformer<JSCControlFlowOptions> {
         }
         if (!additive) continue
         for (const [vk, value] of stack) {
-          var vref = scope.references.find(
+          let vref = scope.references.find(
             (i) => i.identifier.range![0] === value
           )
           if (!vref) continue
@@ -237,7 +237,7 @@ export default class JSCControlFlow extends Transformer<JSCControlFlowOptions> {
             vref.resolved.defs[0].type !== 'Variable'
           )
             continue
-          var def = vref.resolved.defs[0]
+          let def = vref.resolved.defs[0]
           if (
             !def.node.init ||
             (!Guard.isLiteralNumeric(def.node.init) &&
@@ -255,11 +255,11 @@ export default class JSCControlFlow extends Transformer<JSCControlFlowOptions> {
         context.log(stack, endState)
 
         if (!Guard.isBlockStatement(w.body)) continue
-        var ss = w.body.body[w.body.body.length - 1]
+        let ss = w.body.body[w.body.body.length - 1]
         if (!Guard.isSwitchStatement(ss)) continue
         if (!Guard.isIdentifier(ss.discriminant)) continue
-        var strt = ss.discriminant.start
-        var ref = scope.references.find((i) => i.identifier.range![0] === strt)
+        let strt = ss.discriminant.start
+        let ref = scope.references.find((i) => i.identifier.range![0] === strt)
         if (
           !ref ||
           !ref.resolved ||
@@ -267,18 +267,18 @@ export default class JSCControlFlow extends Transformer<JSCControlFlowOptions> {
           ref.resolved.defs[0].type !== 'Variable'
         )
           continue
-        var def = ref.resolved.defs[0]
+        let def = ref.resolved.defs[0]
         if (!def.node.init || !Guard.isBinaryExpression(def.node.init)) continue
 
-        var maxIters = ss.cases.length,
+        let maxIters = ss.cases.length,
           iter = 0
 
-        var stateExpr = def.node.init! as BinaryExpression
+        let stateExpr = def.node.init! as BinaryExpression
 
         // {...vars +} != {endState}
-        var whileStateExpr = w.test.left as BinaryExpression
+        let whileStateExpr = w.test.left as BinaryExpression
 
-        var expressions: Expression[][] = []
+        let expressions: Expression[][] = []
 
         while (true) {
           if (iter > maxIters) {
@@ -287,7 +287,7 @@ export default class JSCControlFlow extends Transformer<JSCControlFlowOptions> {
             )
           }
           context.log(`Iteration #${iter + 1}/${maxIters + 1}`)
-          var wState = evaluateBinaryExpr(stack, whileStateExpr)
+          let wState = evaluateBinaryExpr(stack, whileStateExpr)
           if (wState === endState) {
             context.log(
               'Switch calculation end',
@@ -300,11 +300,11 @@ export default class JSCControlFlow extends Transformer<JSCControlFlowOptions> {
             break
           }
 
-          var state = evaluateBinaryExpr(stack, stateExpr)
-          var errorSuffix = ` (whileState = ${wState}, state = ${state}, stack = ${JSON.stringify(
+          let state = evaluateBinaryExpr(stack, stateExpr)
+          let errorSuffix = ` (whileState = ${wState}, state = ${state}, stack = ${JSON.stringify(
             stack
           )})`
-          var caze = ss.cases.find(
+          let caze = ss.cases.find(
             (i) =>
               i.test &&
               literalOrUnaryExpressionToNumber(i.test as NumericLiteral) ===
@@ -334,7 +334,7 @@ export default class JSCControlFlow extends Transformer<JSCControlFlowOptions> {
               'Switch case consequent[0]<ExpressionStatement>.expression<UnaryExpression> is not a SequenceExpression' +
                 errorSuffix
             )
-          var sequence = caze.consequent[0].expression.argument
+          let sequence = caze.consequent[0].expression.argument
           evaluateSequenceAssignments(stack, sequence)
           sequence.expressions = sequence.expressions.filter(
             (i) => (i as any).type !== 'EmptyStatement'
@@ -362,18 +362,18 @@ export default class JSCControlFlow extends Transformer<JSCControlFlowOptions> {
     function visitor(node: FunctionDeclaration | FunctionExpression) {
       const scope = context.scopeManager.acquire(node)
       if (!scope) return
-      var switches = node.body.body.filter((i) =>
+      let switches = node.body.body.filter((i) =>
         Guard.isSwitchStatement(i)
       ) as SwitchStatement[]
       for (const ss of switches) {
         if (!Guard.isIdentifier(ss.discriminant)) continue
-        var discName = ss.discriminant.name
-        var v = scope.variables.find((i) => i.name === discName)
+        let discName = ss.discriminant.name
+        let v = scope.variables.find((i) => i.name === discName)
         if (!v) continue
         if (v.defs.length === 0 || v.defs[0].type !== 'Variable') continue
-        var def = v.defs[0]
+        let def = v.defs[0]
         if (!def.node.init || !Guard.isBinaryExpression(def.node.init)) continue
-        var init = def.node.init
+        let init = def.node.init
         if (
           !ss.cases.every(
             (c) =>
@@ -383,7 +383,7 @@ export default class JSCControlFlow extends Transformer<JSCControlFlowOptions> {
           )
         )
           continue
-        var leftTrans = 0,
+        let leftTrans = 0,
           leftOper: BinaryOperator = '*',
           rightTrans = 0,
           rightOper: BinaryOperator = '+'
@@ -407,7 +407,7 @@ export default class JSCControlFlow extends Transformer<JSCControlFlowOptions> {
         rightOper = inverseOperator(init.operator)
 
         for (const c of ss.cases) {
-          var test = literalOrUnaryExpressionToNumber(
+          let test = literalOrUnaryExpressionToNumber(
             c.test! as NumericUnaryExpression | NumericLiteral
           )
           test = mathEval(
