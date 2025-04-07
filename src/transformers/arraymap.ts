@@ -26,16 +26,16 @@ export default class ArrayMap extends Transformer<ArrayMapOptions> {
   demap(context: Context) {
     function visitor(func: Function) {
       if (!Guard.isBlockStatement(func.body)) return
-      var body = filterEmptyStatements(func.body.body)
+      const body = filterEmptyStatements(func.body.body)
       if (!body[0]) return
       if (!Guard.isVariableDeclaration(body[0])) return
-      var vd = body[0]
+      const vd = body[0]
       if (vd.declarations.length !== 1) return
-      var decl = vd.declarations[0]
+      const decl = vd.declarations[0]
       if (!decl.init || !Guard.isArrayExpression(decl.init)) return
       if (decl.init.elements[0] !== null) return
       if (!Guard.isIdentifier(decl.id)) return
-      var name = decl.id.name
+      const name = decl.id.name
       let values: (string | number)[] = decl.init.elements.map((el) =>
         el && Guard.isLiteral(el) ? el.value : el
       ) as (string | number)[]
