@@ -20,7 +20,7 @@ import Context from '../../context'
 import { filterEmptyStatements } from '../../util/helpers'
 import { literalOrUnaryExpressionToNumber } from '../../util/translator'
 
-var ALLOWED_OPERATORS = ['+', '-', '*', '/']
+const ALLOWED_OPERATORS = ['+', '-', '*', '/']
 type AllowedOperator = '+' | '-' | '*' | '/'
 interface Operator {
   test: number
@@ -43,14 +43,14 @@ export default class JSCCalculator extends Transformer<JSCCalculatorOptions> {
   }
 
   find(context: Context) {
-    var { functions } = this
+    const { functions } = this
     function visitor(node: FunctionDeclaration | FunctionExpression) {
       let body = filterEmptyStatements(node.body.body)
       if (body.length !== 1) return
       if (!Guard.isSwitchStatement(body[0])) return
       if (!node.id || !Guard.isIdentifier(node.id)) return
-      var fnName = node.id.name
-      var ss = body[0]
+      const fnName = node.id.name
+      const ss = body[0]
       if (
         !ss.cases.every(
           (c) =>
@@ -66,17 +66,17 @@ export default class JSCCalculator extends Transformer<JSCCalculatorOptions> {
         return
 
       if (!Guard.isIdentifier(ss.discriminant)) return
-      var operatorId = ss.discriminant.name
+      const operatorId = ss.discriminant.name
 
       // check for each param being an identifier breaks on spread
-      var indices = node.params.map((i) => Guard.isIdentifier(i) && i.name)
-      var func: CalcFunction = {
+      const indices = node.params.map((i) => Guard.isIdentifier(i) && i.name)
+      const func: CalcFunction = {
         identifier: fnName,
         operators: [],
         operIndex: indices.findIndex((i) => i === operatorId),
       }
 
-      for (var c of ss.cases) {
+      for (const c of ss.cases) {
         if (
           !c.test ||
           (!Guard.isLiteralNumeric(c.test) && !Guard.isUnaryExpression(c.test))
@@ -93,7 +93,7 @@ export default class JSCCalculator extends Transformer<JSCCalculatorOptions> {
         let lhsIndex = indices.findIndex((i) => i === lhsId),
           rhsIndex = indices.findIndex((i) => i === rhsId)
 
-        var oper: Operator = {
+        const oper: Operator = {
           test: test,
           operator: binex.operator as AllowedOperator,
           lhsIndex,
@@ -121,7 +121,7 @@ export default class JSCCalculator extends Transformer<JSCCalculatorOptions> {
   }
 
   fix(context: Context) {
-    var { functions } = this
+    const { functions } = this
     walk(context.ast, {
       CallExpression(cx) {
         if (!Guard.isIdentifier(cx.callee)) return
@@ -135,9 +135,9 @@ export default class JSCCalculator extends Transformer<JSCCalculatorOptions> {
           !Guard.isUnaryExpressionNumeric(_test)
         )
           return
-        var test = literalOrUnaryExpressionToNumber(_test)
+        const test = literalOrUnaryExpressionToNumber(_test)
 
-        var operator = func.operators.find((i) => i.test === test)
+        const operator = func.operators.find((i) => i.test === test)
         if (!operator) return
         let lhs = cx.arguments[operator.lhsIndex] as Expression,
           rhs = cx.arguments[operator.rhsIndex] as Expression
