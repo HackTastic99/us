@@ -58,12 +58,12 @@ export function walk<TState>(
   state?: TState,
   _override?: NodeType
 ): Node {
-  let ancestors: Node[] = []
+  var ancestors: Node[] = []
   const baseVisitors = base || AcornBaseVisitors
   ;(function c(node, st, override) {
-    let type: NodeType = override || node.type,
+    var type: NodeType = override || node.type,
       found = visitors[type]
-    let isNew = node !== ancestors[ancestors.length - 1]
+    var isNew = node !== ancestors[ancestors.length - 1]
     if (isNew) ancestors.push(node)
     baseVisitors[type]!(node as any, st, c as any) // this isn't undefined?
     if (found) {
@@ -104,7 +104,7 @@ export function findNodeAt<TNode extends Node>(
     end = range[1]
   try {
     ;(function c(node, _st, override) {
-      let type: NodeType = override || node.type
+      var type: NodeType = override || node.type
       if (
         (start == null || node.start <= start) &&
         (end == null || node.end >= end)
