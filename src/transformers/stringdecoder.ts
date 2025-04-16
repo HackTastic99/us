@@ -48,10 +48,10 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
   }
 
   private util_b64_decode(chars: string, input: string): string {
-    var output = '',
+    let output = '',
       tempEncStr = ''
     for (
-      var bc = 0, bs = 0, buffer, idx = 0;
+      let bc = 0, bs = 0, buffer, idx = 0;
       (buffer = input.charAt(idx++));
       ~buffer && ((bs = bc % 4 ? bs * 64 + buffer : buffer), bc++ % 4)
         ? (output += String.fromCharCode(255 & (bs >> ((-2 * bc) & 6))))
@@ -59,21 +59,21 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
     ) {
       buffer = chars.indexOf(buffer)
     }
-    for (var k = 0, length = output.length; k < length; k++) {
+    for (let k = 0, length = output.length; k < length; k++) {
       tempEncStr += '%' + ('00' + output.charCodeAt(k).toString(16)).slice(-2)
     }
     return decodeURIComponent(tempEncStr)
   }
   private util_rc4_decode(chars: string, str: string, key: string): string {
     // sorry
-    var s = [],
+    let s = [],
       j = 0,
       x,
       output = ''
 
     str = this.util_b64_decode(chars, str)
 
-    var i
+    let i
     for (i = 0; i < 256; i++) {
       s[i] = i
     }
@@ -85,7 +85,7 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
     }
     i = 0
     j = 0
-    for (var y = 0; y < str.length; y++) {
+    for (let y = 0; y < str.length; y++) {
       i = (i + 1) % 256
       j = (j + s[i]) % 256
       x = s[i]
@@ -102,22 +102,22 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
     args: (string | number | undefined)[]
   ) => {
     // """type safety"""
-    var decoder: DecoderFunction,
+    let decoder: DecoderFunction,
       offset = 0,
       indexArg = 0,
       keyArg = 1,
       decRef = -1
 
-    var predicate = (dec: DecoderFunction | DecoderReference) =>
+    let predicate = (dec: DecoderFunction | DecoderReference) =>
       dec.identifier === identifier
     if (context.stringDecoders.findIndex(predicate) !== -1) {
       decoder = context.stringDecoders.find(predicate)!
     } else if (
       (decRef = context.stringDecoderReferences.findIndex(predicate)) !== -1
     ) {
-      var ref = context.stringDecoderReferences[decRef]
+      let ref = context.stringDecoderReferences[decRef]
       offset += ref.additionalOffset
-      var fndDec: DecoderReference | undefined = ref as any
+      let fndDec: DecoderReference | undefined = ref as any
       identifier = ref.realIdentifier
       while (fndDec) {
         fndDec = context.stringDecoderReferences.find(predicate)
@@ -140,7 +140,7 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
     }
 
     offset += decoder.offset
-    var index =
+    let index =
         typeof args[indexArg] === 'string'
           ? parseInt(args[indexArg] as string)
           : (args[indexArg] as number),
@@ -198,7 +198,7 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
     index: number,
     offset: number
   ) {
-    var str = this.getString(context, identifier, index, offset),
+    let str = this.getString(context, identifier, index, offset),
       charset = (
         context.stringDecoders.find(
           (d) =>
@@ -214,7 +214,7 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
     key: string,
     offset: number
   ) {
-    var str = this.getString(context, identifier, index, offset),
+    let str = this.getString(context, identifier, index, offset),
       charset = (
         context.stringDecoders.find(
           (d) =>
@@ -231,7 +231,7 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
     if (context.stringArrays.some((i) => i.type === StringArrayType.ARRAY)) {
       walk(context.ast, {
         VariableDeclaration(node, _, ancestors) {
-          var rm: string[] = []
+          let rm: string[] = []
           for (const vd of node.declarations) {
             if (!Guard.isIdentifier(vd.id)) continue
             if (!vd.init || !Guard.isArrayExpression(vd.init)) continue
@@ -285,7 +285,7 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
           block.body[0].declarations[0].init?.type !== 'ArrayExpression' // `init?: Expression | null | undefined` ??????
         )
           return
-        var fnId = node.id?.name,
+        let fnId = node.id?.name,
           strArrayId = block.body[0].declarations[0].id.name,
           strArray = block.body[0].declarations[0].init
         if (
@@ -341,9 +341,9 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
           block.body.length !== 1
         )
           return
-        var retn = block.body[block.body.length - 1]
+        let retn = block.body[block.body.length - 1]
         if (!Guard.isReturnStatement(retn) || !retn.argument) return
-        var fn: FunctionExpression,
+        let fn: FunctionExpression,
           ae: AssignmentExpression | undefined = undefined
 
         if (retn.argument.type === 'SequenceExpression') {
@@ -380,7 +380,7 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
         fn = ae.right
 
         const stringArrayNames = context.stringArrays.map((i) => i.identifier)
-        var ourStringArray = ''
+        let ourStringArray = ''
 
         if (
           block.body.length !== 1 &&
@@ -411,7 +411,7 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
           // locate the stringArray after funcFinder is ran
 
           ourStringArray = body[1].declarations[0].init.object.name
-          var strArrayObj = {
+          let strArrayObj = {
             identifier: ourStringArray,
             type: StringArrayType.ARRAY,
             strings: [],
@@ -424,7 +424,7 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
           )
         }
 
-        var calcOffset = 0
+        let calcOffset = 0
         if (
           !Guard.isExpressionStatement(body[0]) ||
           !Guard.isAssignmentExpression(body[0].expression) ||
@@ -442,7 +442,7 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
         if (body[0].expression.right.operator === '-')
           calcOffset = calcOffset * -1
 
-        var decFn = {
+        let decFn = {
           identifier: node.id.name,
           stringArrayIdentifier: ourStringArray,
           offset: calcOffset,
@@ -517,11 +517,11 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
                   body[2].consequent.body[1].declarations[0].init!
                 ))
             ) {
-              var fx = body[2].consequent.body[0].declarations[0].init,
+              let fx = body[2].consequent.body[0].declarations[0].init,
                 fxb = fx.body.body
               if (Guard.isVariableDeclaration(fxb[0])) {
                 if (Guard.isLiteralString(fxb[0].declarations[0].init!)) {
-                  var charset = fxb[0].declarations[0].init.value
+                  let charset = fxb[0].declarations[0].init.value
                   if (charset.length === 65) {
                     // charset declaration
                     decFn.type = DecoderFunctionType.BASE64
@@ -542,11 +542,11 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
                 body[2].consequent.body[1].declarations[0].init!
               )
             ) {
-              var fx = body[2].consequent.body[0].declarations[0].init,
+              let fx = body[2].consequent.body[0].declarations[0].init,
                 fxb = fx.body.body
               if (Guard.isVariableDeclaration(fxb[0])) {
                 if (Guard.isLiteralString(fxb[0].declarations[0].init!)) {
-                  var charset = fxb[0].declarations[0].init.value
+                  let charset = fxb[0].declarations[0].init.value
                   if (charset.length === 65) {
                     // charset declaration
 
@@ -592,7 +592,7 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
     const stringArray = context.stringArrays.find(
       (i) => i.identifier === stringArrayIdent
     )!
-    var maxLoops = stringArray.strings.length * 2,
+    let maxLoops = stringArray.strings.length * 2,
       iteration = 0
     while (true) {
       iteration++
@@ -603,7 +603,7 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
       }
       // Classes suck
       const bpic = immutate(parseIntChain)
-      var hasNaN = false
+      let hasNaN = false
 
       stringArray.strings.push(stringArray.strings.shift() as string)
 
@@ -631,9 +631,9 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
             node.arguments[0].arguments[0].type !== 'UnaryExpression'
           )
             return
-          var val = -1
+          let val = -1
           try {
-            var args = literals_to_arg_array(node.arguments[0].arguments)
+            let args = literals_to_arg_array(node.arguments[0].arguments)
             val = parseInt(
               util_decode(context, node.arguments[0].callee.name, args)
             )
@@ -686,7 +686,7 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
         bRev = [...body].reverse()
 
       if (body.length < 2) return
-      var loopBody: Statement[]
+      let loopBody: Statement[]
       if (bRev[0].type === 'ForStatement') {
         if (!Guard.isBlockStatement(bRev[0].body)) return
         loopBody = filterEmptyStatements(bRev[0].body.body) as Statement[]
@@ -702,14 +702,14 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
         filterEmptyStatements(loopBody[0].block.body).length !== 2
       )
         return
-      var blockBody = filterEmptyStatements(loopBody[0].block.body)
+      let blockBody = filterEmptyStatements(loopBody[0].block.body)
 
       // string array id
       if (node.arguments.length !== 2) return
       if (node.arguments[0].type !== 'Identifier') return
       if (node.arguments[1].type !== 'Literal') return
       const breakCond = node.arguments[1].value
-      var pic: Expression
+      let pic: Expression
 
       if (blockBody[0].type === 'VariableDeclaration') {
         if (!blockBody[0].declarations[0].init) return
@@ -753,7 +753,7 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
     walk(context.ast, {
       ExpressionStatement(node) {
         if (Guard.isSequenceExpression(node.expression)) {
-          var rm: string[] = []
+          let rm: string[] = []
           for (const exp of node.expression.expressions) {
             if (visitor(exp)) rm.push(`${exp.start}!${exp.end}`)
           }
@@ -787,7 +787,7 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
       const scope = context.scopeManager.acquire(node.callee)
       if (!scope) return
 
-      var foundPushShift = false,
+      let foundPushShift = false,
         stringArrayRef: string
 
       walk(node, {
@@ -813,7 +813,7 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
       })
       if (!foundPushShift) return false
 
-      var foundStringArrayVar = scope.variables.find(
+      let foundStringArrayVar = scope.variables.find(
         (i) => i.name === stringArrayRef
       )
       if (!foundStringArrayVar) return false
@@ -831,14 +831,14 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
       )
       if (!stringArrayFunc) return false
 
-      var foundBinExp = false,
+      let foundBinExp = false,
         breakCond: number | undefined,
         pic: BinaryExpression | undefined
       walk(node, {
         IfStatement(ifs) {
           if (!Guard.isBinaryExpression(ifs.test)) return
           if (ifs.test.operator !== '==' && ifs.test.operator !== '===') return
-          var bc: NumericLiteral | undefined, bx: BinaryExpression | undefined
+          let bc: NumericLiteral | undefined, bx: BinaryExpression | undefined
           if (Guard.isLiteralNumeric(ifs.test.left)) {
             if (!Guard.isBinaryExpression(ifs.test.right)) return
             bc = ifs.test.left
@@ -870,7 +870,7 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
     walk(context.ast, {
       ExpressionStatement(node) {
         if (Guard.isSequenceExpression(node.expression)) {
-          var rm: string[] = []
+          let rm: string[] = []
           for (const exp of node.expression.expressions) {
             if (visitor(exp)) rm.push(`${exp.start}!${exp.end}`)
           }
@@ -896,16 +896,16 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
 
   // Scan for variable references to the decoder functions
   varReferenceFinder(context: Context) {
-    var newRefsFound = 0
+    let newRefsFound = 0
     walk(context.ast, {
       VariableDeclaration(vd) {
-        var rm: string[] = []
+        let rm: string[] = []
         for (const decl of vd.declarations) {
           if (decl.init?.type !== 'Identifier' || decl.id.type !== 'Identifier')
             continue
-          var refName = decl.id.name,
+          let refName = decl.id.name,
             valName = decl.init.name
-          var foundDecoder: DecoderFunction | DecoderReference | undefined =
+          let foundDecoder: DecoderFunction | DecoderReference | undefined =
             context.stringDecoders.find((d) => d.identifier === valName)
           if (!foundDecoder) {
             foundDecoder = context.stringDecoderReferences.find(
@@ -938,10 +938,10 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
 
   // Scan for function references to the decoder functions and their references
   fnReferenceFinder(context: Context) {
-    var newRefsFound = 0
+    let newRefsFound = 0
     walk(context.ast, {
       FunctionDeclaration(node) {
-        var body = filterEmptyStatements(node.body.body)
+        let body = filterEmptyStatements(node.body.body)
         if (
           !node.id ||
           body.length !== 1 ||
@@ -956,7 +956,7 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
           retn = body[0],
           cx = body[0].argument!
         const calleeId = (cx.callee as Identifier).name
-        var i = 0,
+        let i = 0,
           offset = 0,
           indexArg = -1,
           keyArg = -1
@@ -999,7 +999,7 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
               }
             },
             BinaryExpression(bx) {
-              var num = NaN
+              let num = NaN
               if (i !== parent.indexArgument) return
               if (
                 Guard.isUnaryExpression(bx.left) ||
@@ -1078,8 +1078,8 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
 
         if (name === 'parseInt') return
         try {
-          var args = literals_to_arg_array(node.arguments)
-          var val = util_decode(context, name, args)
+          let args = literals_to_arg_array(node.arguments)
+          let val = util_decode(context, name, args)
           sp<Literal>(node, {
             type: 'Literal',
             value: val,
@@ -1088,13 +1088,13 @@ export default class StringDecoder extends Transformer<StringDecoderOptions> {
           if (err.toString().includes('no decoder')) return
           throw err
         }
-        /*var foundRef = context.stringDecoderReferences.find(
+        /*let foundRef = context.stringDecoderReferences.find(
           (ref) => ref.identifier === name
         )
         if (!foundRef) return // not a string decode call
 
         // foundRef is not undefined thank u TS
-        var foundDec = context.stringDecoders.find(
+        let foundDec = context.stringDecoders.find(
           (dec) => dec.identifier === foundRef!.realIdentifier
         )
         if (!foundDec) return*/
