@@ -33,7 +33,7 @@ export default class DeadCode extends Transformer<DeadCodeOptions> {
         )
           return
 
-        let cons = node.consequent,
+        var cons = node.consequent,
           alt = Guard.isIfStatement(node.alternate)
             ? node.alternate.consequent
             : node.alternate
@@ -71,14 +71,14 @@ export default class DeadCode extends Transformer<DeadCodeOptions> {
         if (!Guard.isLiteralBoolean(node.test) || node.test.value !== true)
           return
 
-        let parent = ancestors[ancestors.length - 2]
+        var parent = ancestors[ancestors.length - 2]
         if (
           !Guard.isBlockStatement(parent) ||
           !Guard.isBlockStatement(node.consequent)
         )
           return
 
-        let ourIdx = parent.body.findIndex(
+        var ourIdx = parent.body.findIndex(
           (n) =>
             n.type === node.type && n.start === node.start && n.end === node.end
         )
@@ -103,7 +103,7 @@ export default class DeadCode extends Transformer<DeadCodeOptions> {
 
         // dead
 
-        let ourIdx = parent.body.findIndex(
+        var ourIdx = parent.body.findIndex(
           (e) =>
             e.type === node.type && e.start === node.start && e.end === node.end
         )
@@ -116,7 +116,7 @@ export default class DeadCode extends Transformer<DeadCodeOptions> {
         if (!Guard.isBlockStatement(parent)) return
         if (!Guard.isLiteralBoolean(node.test) || node.test.value) return
 
-        let ourIdx = parent.body.findIndex(
+        var ourIdx = parent.body.findIndex(
           (e) =>
             e.type === node.type && e.start === node.start && e.end === node.end
         )
@@ -139,9 +139,9 @@ export default class DeadCode extends Transformer<DeadCodeOptions> {
         if (v.defs[0].type !== 'Variable') continue
 
         if (v.references.length === 0) {
-          let def = v.defs[0]
-          let node = def.node as VariableDeclarator
-          let p = findNodeAt<VariableDeclaration>(
+          var def = v.defs[0]
+          var node = def.node as VariableDeclarator
+          var p = findNodeAt<VariableDeclaration>(
             func,
             def.parent.range!,
             'VariableDeclaration'
